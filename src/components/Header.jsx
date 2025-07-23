@@ -1,27 +1,48 @@
-import React from "react";
-import { signOut } from "firebase/auth";
+import React, { useEffect } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import {  useSelector } from "react-redux";
+import {  useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { addUser, removeUser } from "../utils/slices/userSlice";
 
 const Header = () => {
   const user = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
+  
   const navigate = useNavigate();
+  const dispatch = useDispatch(); 
 
   const handleSignout = () => {
     signOut(auth)
     .then(() => {
-        navigate("/");
-        // Sign-out successful.
+        
       })
       .catch((error) => {
-        // An error happened.
+    
         console.log(error);
       });
   };
+  
 
-  console.log( user);
+useEffect(() => {
+     const unsubscribe = 
+     onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+        const { uid, email, displayName } = user;
+        // ...
+        dispatch (addUser({uid : uid , email: email , displayName: displayName }))
+        navigate("/browse")
+      } else {
+        // User is signed out
+        // ...
+        dispatch (removeUser ());
+        navigate("/")
+      }
+    });
+    return () =>  unsubscribe ();
+  }, [dispatch, navigate]);
+
   return (
     <div className="absolute px-13 py-8 w-full  bg-gradient-to-b from-black z-100 flex justify-between">
       <img

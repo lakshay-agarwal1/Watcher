@@ -1,10 +1,9 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Header from "./Header";
 import validateInput from "../utils/validation";
 
 import { addUser } from "../utils/slices/userSlice";
 
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { signUpUser, signInUser } from "../utils/services/authService";
@@ -14,7 +13,6 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const name = useRef(null);
@@ -31,7 +29,7 @@ const Login = () => {
     );
     setErrorMessage(msg);
     if (msg) return;
-
+    setIsLoading(true);
     try {
       if (!isSigninForm) {
         const user = await signUpUser(
@@ -47,17 +45,10 @@ const Login = () => {
           })
         );
       } else {
-        // const user =
+       
         await signInUser(email.current.value, password.current.value);
-        // dispatch(
-        //   addUser({
-        //     uid: user.uid,
-        //     email: user.email,
-        //     displayName: user.displayName,
-        //   })
-        // );
+       
       }
-      navigate("/browse");
     } catch (error) {
       const errorCode = error.code;
       const errorMsg = error.message;
@@ -83,7 +74,7 @@ const Login = () => {
 
       <div className="relative z-20 flex flex-col items-center w-full h-screen inset-0 bg-black/55">
         <form className="bg-black/75 rounded-md w-full max-w-md p-10 mt-50 flex flex-col gap-6">
-          {/* Logo mimic */}
+        
 
           <h2 className="text-3xl font-bold mb-4 text-white">
             {isSigninForm ? "Sign In" : "Sign Up"}
